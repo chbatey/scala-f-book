@@ -95,6 +95,28 @@ object List {
     foldLeft(listOfLists, Nil: List[A])(joinTwoLists)
   }
 
+  def addOneToAll(list : List[Int]) : List[Int] = {
+     foldRight(list, Nil: List[Int])((newItem, acc) => Cons(newItem + 1, acc))
+  }
+
+  def convertDoubleListToStringList(list: List[Double]) : List[String] = {
+    foldRight(list, Nil: List[String])((newItem, acc) => Cons(newItem.toString, acc))
+  }
+
+  def map[A, B](list: List[A])(f: A => B) : List[B] = {
+    foldRight(list, Nil: List[B])((newItem, acc) => Cons(f(newItem), acc))
+  }
+
+  def filter[A](list: List[A])(f: A => Boolean) : List[A] = {
+    foldRight(list, Nil: List[A])((newItem, acc) => {
+      if (f(newItem)) Cons(newItem, acc)
+      else acc
+    })
+  }
+
+  def flatMap[A, B](list: List[A])(f: A => List[B]) : List[B] = {
+    foldRight(list, Nil: List[B])((newItem, acc) => listOfLists(List(f(newItem), acc)))
+  }
 
   def apply[A](as: A*): List[A] =
     if (as.isEmpty) Nil

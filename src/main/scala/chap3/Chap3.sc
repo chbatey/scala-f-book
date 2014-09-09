@@ -26,5 +26,17 @@ List.foldLeft(List(1,2,3,4), Nil: List[Int])((a,b) => Cons(b, a))
 
 List.listOfLists(List(List(1,2,3), List(4,5,6)))
 
+List.addOneToAll(List(1))
+List.addOneToAll(List(1,2))
+List.addOneToAll(List(1,2,3))
+List.addOneToAll(List(1,2,3,4))
+
+List.convertDoubleListToStringList(List(1.0, 2.0))
+
+List.map(List(1,2,3,4))(_ + 1)
+
+List.filter(List(1,2,3,4,5,6))(_ % 2 == 0)
+
+List.flatMap(List(1,2,3))(i => List(i, i))
 
 
