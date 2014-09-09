@@ -24,7 +24,7 @@ List.foldRight2(List(1,2,3,4), 0)((a,b) => b + 1)
 List.foldLeft(List(1,2,3,4), 0)((b,a) => b + 1)
 List.foldLeft(List(1,2,3,4), Nil: List[Int])((a,b) => Cons(b, a))
 
-List
+List.listOfLists(List(List(1,2,3), List(4,5,6)))
 
 
 

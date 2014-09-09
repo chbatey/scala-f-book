@@ -58,6 +58,7 @@ object List {
       case Cons(x, xs) => f(x, foldRight(xs, z)(f))
     }
   }
+
   def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
     l match {
       case Nil => z
@@ -70,8 +71,8 @@ object List {
   }
 
   def foldRight2[A, B](l: List[A], z: B)(f: (A, B) => B): B = {
-    val f2 = (right: B, left : A) => f(left, right)
-    List.foldLeft(List.foldLeft(l, Nil: List[A])((a,b) => Cons(b, a)), z)(f2)
+    val f2 = (right: B, left: A) => f(left, right)
+    List.foldLeft(List.foldLeft(l, Nil: List[A])((a, b) => Cons(b, a)), z)(f2)
   }
 
   def sum2(l: List[Int]) = {
@@ -83,8 +84,15 @@ object List {
     foldRight(l, 1.0)(_ * _)
   }
 
-  def append[A](l: List[A], a: A) = {
-    List.foldRight(l, Cons(a, Nil))( (a, b) => Cons(a, b) )
+  def append[A](l: List[A], a: A): List[A] = {
+    List.foldRight(l, Cons(a, Nil))((a, b) => Cons(a, b))
+  }
+
+  def listOfLists[A](listOfLists: List[List[A]]) = {
+    val joinTwoLists: (List[A], List[A]) => List[A] = (firstList, secondList) => {
+      foldRight(firstList, secondList)((newItem, accList) => Cons(newItem, accList))
+    }
+    foldLeft(listOfLists, Nil: List[A])(joinTwoLists)
   }
 
 
