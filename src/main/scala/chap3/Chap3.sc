@@ -36,7 +36,7 @@ List.convertDoubleListToStringList(List(1.0, 2.0))
 List.map(List(1,2,3,4))(_ + 1)
 
 List.filter(List(1,2,3,4,5,6))(_ % 2 == 0)
-
+List.filter2(List(1,2,3,4,5,6))(_ % 2 == 0)
 List.flatMap(List(1,2,3))(i => List(i, i))
 
 

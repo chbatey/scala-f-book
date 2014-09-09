@@ -118,6 +118,13 @@ object List {
     foldRight(list, Nil: List[B])((newItem, acc) => listOfLists(List(f(newItem), acc)))
   }
 
+  def filter2[A](list: List[A])(f: A => Boolean) : List[A] = {
+    flatMap(list)((a) => {
+      if (f(a)) List(a)
+      else Nil
+    })
+  }
+
   def apply[A](as: A*): List[A] =
     if (as.isEmpty) Nil
     else Cons(as.head, apply(as.tail: _*))
