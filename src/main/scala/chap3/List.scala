@@ -124,6 +124,14 @@ object List {
       else Nil
     })
   }
+//
+//  def combineLists[A](list: List[A], list2: List[A], f: (A, A) => A) = {
+//    flatMap(List(list, list2))((a), )
+//  }
+//
+//  def hasSubsequence[A](l: List[A], sub: List[A]): Boolean = {
+//    foldLeft(l, false)((hasBeenFound, start) => false)
+//  }
 
   def apply[A](as: A*): List[A] =
     if (as.isEmpty) Nil
