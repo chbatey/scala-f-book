@@ -16,13 +16,7 @@ object RNG {
     }
   }
 
-  def positiveInt(rng: RNG): (Int, RNG) = {
-    val random: (Int, RNG) = rng.nextInt
-    random match {
-      case (Integer.MIN_VALUE, rng) => positiveInt(rng)
-      case _ => (random._1.abs, random._2)
-    }
-  }
+
 
 
   def double: Rand[Double] = {
@@ -54,12 +48,6 @@ object RNG {
     rng => (a, rng)
   }
 
-  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = {
-    rng => {
-      val (a, rng2) = s(rng)
-      (f(a), rng2)
-    }
-  }
 
   def positiveMax(n: Int): Rand[Int] = {
     map(positiveInt)(int => int % n)
@@ -73,7 +61,25 @@ object RNG {
     }
   }
 
-  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = {
-    ???
+  def map[A, B](s: Rand[A])(f: A => B): Rand[B] = {
+    rng => {
+      val (a, rng2) = s(rng)
+      (f(a), rng2)
+    }
+  }
+
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = {
+    rnd => {
+      val (a, rnd2) = f(rnd)
+      g(a)(rnd2)
+    }
+  }
+
+  def positiveInt(rng: RNG): (Int, RNG) = {
+    val random: (Int, RNG) = rng.nextInt
+    random match {
+      case (Integer.MIN_VALUE, rng) => positiveInt(rng)
+      case _ => (random._1.abs, random._2)
+    }
   }
 }
