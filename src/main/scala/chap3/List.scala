@@ -37,6 +37,15 @@ object List {
       }
     }
   }
+
+  //ex5
+  def setHead[A](l: List[A], newHead: A) = {
+    l match {
+      case Nil => Cons(newHead, Nil)
+      case Cons(h, t) => Cons(newHead, t);
+    }
+  }
+
 }
 
 object Main extends App {
@@ -47,5 +56,7 @@ object Main extends App {
   println(List.drop(list, 2))
 
   println(List.dropWhile(list)(_ != 4))
+
+  println(List.setHead(list, 500))
 
 }
