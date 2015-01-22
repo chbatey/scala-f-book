@@ -46,6 +46,15 @@ object List {
     }
   }
 
+  //ex6
+  def init[A](l: List[A]): List[A] = {
+    l match {
+      case Nil => Nil
+      case Cons(h, Nil) => Nil
+      case Cons(h, rest) => Cons(h, init(rest))
+    }
+  }
+
 }
 
 object Main extends App {
@@ -58,5 +67,7 @@ object Main extends App {
   println(List.dropWhile(list)(_ != 4))
 
   println(List.setHead(list, 500))
+
+  println(List.init(list))
 
 }
