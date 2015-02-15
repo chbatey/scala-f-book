@@ -61,16 +61,16 @@ object List {
       case Cons(x, xs) => f(x, foldRight(xs, z)(f))
     }
 
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
     l match {
       case Nil => z
       case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
     }
   }
 
-  def foldLeft2[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+  def foldLeft2[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
     val reverse1: List[A] = List.reverse(l)
-    foldRight(reverse1, z)((a: A, b:B) => f(b, a))
+    foldRight(reverse1, z)((a: A, b: B) => f(b, a))
   }
 
   def sum2(l: List[Int]) =
@@ -88,7 +88,7 @@ object List {
 
   // ex-9
   def length[A](l: List[A]): Int = {
-    foldRight(l, 0)((a,b) => b + 1)
+    foldRight(l, 0)((a, b) => b + 1)
   }
 
   //ex-12
@@ -103,10 +103,52 @@ object List {
 
   //ex-15
   def concat[A](l: List[List[A]]): List[A] = {
-    foldRight(l, Nil: List[A])( (newList, accList) =>
-      foldRight(newList, accList)(Cons(_,_))
+    foldRight(l, Nil: List[A])((newList, accList) =>
+      foldRight(newList, accList)(Cons(_, _))
     )
   }
+
+  //ex-16
+  def addOne(l: List[Int]): List[Int] = {
+    foldRight(l, Nil: List[Int])((value, acc) => Cons(value + 1, acc))
+  }
+
+  //ex-17
+  def doubleToString(l: List[Double]): List[String] = {
+    foldRight(l, Nil: List[String])((value, acc) => Cons(value.toString, acc))
+  }
+
+  //ex-18
+  def map[A, B](l: List[A])(f: A => B): List[B] = {
+    foldRight(l, Nil: List[B])((value, acc) => Cons(f(value), acc))
+  }
+
+  //ex-19 / 21
+  def filter[A](l: List[A])(f: A => Boolean): List[A] = {
+    flatMap(l)(value => if (f(value)) List(value) else Nil)
+  }
+
+  //ex-20
+  def flatMap[A, B](l: List[A])(f: A => List[B]): List[B] = {
+    foldRight(l, Nil: List[B])((value, acc) => concat(List(f(value), acc)))
+  }
+
+//  //ex 22 - todo
+//  def add[Int](l1: List[Int], l2: List[Int]): List[Int] = {
+//    foldRight(l1, Nil: List[Int]) { (value: Int, acc) => {
+//        val last = foldLeft(l2, 0)((b,a) => b)
+////        val init = init(l2)
+//        Cons(value. + last, acc)
+//        ???
+//      }
+//    }
+//    ???
+//  }
+//
+//  //ex 24 - todo
+//  def hasSubsequence[Int](list: List[Int], sub: List[Int]): Boolean = {
+//    ???
+//  }
 
 }
 
@@ -123,7 +165,7 @@ object Main extends App {
 
   println(List.setHead(list, 500))
 
-  println(List.init(list))
+  println("Init: " + List.init(list))
 
   println(List.foldRight(list, Nil: List[Int])(Cons.apply))
 
@@ -133,5 +175,12 @@ object Main extends App {
   println("Reverse: " + List.reverse(list))
   println("Append: " + List.append(list, 5))
   println("Concat: " + List.concat(List(list, list2)))
-
+  println("Add One: " + List.addOne(list))
+  private val string: List[String] = List.doubleToString(List(1.0, 2.0))
+  println("ToString: " + string)
+  println("Map Add One: " + List.map(list)(_ + 1))
+  println("Filter odd" + List.filter(list)(_ % 2 == 0))
+  println("Flat map: duplicate: " + List.flatMap(list)(value => List(value, value + 1)))
+  val last: Int = List.foldLeft(list, 0)((acc: Int, next: Int) => next)
+  println("Last: " + last)
 }
