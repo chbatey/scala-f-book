@@ -58,12 +58,20 @@ object MonoidMain {
   //ex-2
   def optionMonoid[A]: Monoid[Option[A]] = new Monoid[Option[A]] {
     def op(a1: Option[A], a2: Option[A]): Option[A] = {
-      a1.c
+      ???
     }
 
     def zero: Option[A] = {
-
+      ???
     }
+  }
+
+  //ex-3
+  def EndoMonoid[A]: Monoid[A => A] = new Monoid[(A) => A] {
+
+    override def op(a1: (A) => A, a2: (A) => A): (A) => A = ???
+
+    override def zero: (A) => A = ???
   }
 
 }
