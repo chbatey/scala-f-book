@@ -1,5 +1,7 @@
 package chap10
 
+import scala.language.higherKinds
+
 trait Monoid[A] {
   def op(a1: A, a2: A): A
 
@@ -137,9 +139,44 @@ object MonoidMain {
         case IndexedSeq(a) => f(a)
         case _ =>
           val (first, second) = v.splitAt(v.length / 2)
+//          println(s"$first $second")
           m.op(foldMapV(first, m)(f), foldMapV(second, m)(f))
       }
   }
+
+  //ex-12
+  val orderedMonoid = new Monoid[Int] {
+    override def op(a1: Int, a2: Int): Int = {
+      if (a1 < a2)
+        a2
+      else
+        a1
+    }
+
+    override def zero: Int = 0
+  }
+
+//  trait Foldable[F[_]] {
+//    def foldRight[A, B](as: F[A])(f: (A, B) => B): B
+//    def foldLeft[A, B](as: F[A])(f: (B, A) => B): B
+//    def foldMap[A, B](as: F[A])(f: A => B)(mb: Monoid[B]): B
+//    def concatenate[A](as: F[A])(m: Monoid[A]): A =
+//      as.foldLeft(m.zero)(m.op)
+//  }
+
+  //ex-17
+  def productMonoid[A,B](A: Monoid[A], B: Monoid[B]): Monoid[(A,B)] = {
+    new Monoid[(A, B)] {
+
+      override def op(a1: (A, B), a2: (A, B)): (A, B) = (A.op(a1._1, a2._1), B.op(a1._2, a2._2))
+
+      override def zero: (A, B) = (A.zero, B.zero)
+    }
+  }
+
+  
+  def stringIntSomething: Monoid[(String, Int)] = productMonoid(stringMonoid, intAddition)
+
 
   def main(args: Array[String]): Unit = {
     val sentence = List("hello", "there", "i", " like ", "cassandra " )
@@ -159,6 +196,20 @@ object MonoidMain {
     val vector = Vector(1,2,3,4,5)
     val multiplied = foldMapV(vector, intMultiplication)(a => a*2)
     println(multiplied)
+//    println(foldMapV(vector, orderedMonoid)(a=>a) == vector.last)
+    val v2: Vector[Int] = Vector(5, 4, 3, 2, 1)
+    println(foldMapV(v2, orderedMonoid)(a=>a) == v2.last)
+    val v3: Vector[Int] = Vector(1, 2, 3, 4, 3)
+    println(foldMapV(v3, orderedMonoid)(a=>a) == v3.last)
+
+    val v4: Vector[Int] = Vector(1)
+    println(foldMapV(v4, orderedMonoid)(a=>a) == v4.last)
+
+    val v5: Vector[Int] = Vector()
+    println(foldMapV(v5, orderedMonoid)(a=>a))
+
+    val pairs = List(("one", 1), ("two", 2))
+    println(pairs.foldLeft(stringIntSomething.zero)(stringIntSomething.op))
   }
 }
 
