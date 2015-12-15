@@ -7,180 +7,185 @@ case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
 object List {
-
-  def apply[A](items: A*): List[A] = {
-    if (items.isEmpty) Nil
-    else Cons(items.head, apply(items.tail: _ *))
+  def sum(ints: List[Int]): Int = ints match {
+    case Nil => 0
+    case Cons(x, xs) => x + sum(xs)
   }
 
-  //ex2
-  def tail[A](list: List[A]): List[A] = {
-    list match {
-      case Nil => Nil
-      case Cons(h, xs) => xs
+  def product(ds: List[Double]): Double = ds match {
+    case Nil => 1.0
+    case Cons(x, xs) => x * product(xs)
+  }
+
+  def tail[T](ds: List[T]): List[T] = drop(1, ds)
+  
+  def drop[T](n: Int, ds: List[T]): List[T] = {
+    if (n == 0) ds
+    else ds match {
+      case Nil => ds
+      case Cons(_, t) => drop(n - 1, t)
     }
   }
 
-  //ex3
-  def drop[A](l: List[A], n: Int): List[A] = {
-    if (n == 0) l
-    else drop(tail(l), n - 1)
-  }
-
-  //ex4
-  def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = {
-    l match {
-      case Nil => Nil
-      case Cons(a, tail) => {
-        if (f(a)) dropWhile(tail)(f)
-        else l
-      }
-    }
-  }
-
-  //ex5
-  def setHead[A](l: List[A], newHead: A) = {
-    l match {
-      case Nil => Cons(newHead, Nil)
-      case Cons(h, t) => Cons(newHead, t);
-    }
-  }
-
-  //ex6
-  def init[A](l: List[A]): List[A] = {
-    l match {
-      case Nil => Nil
-      case Cons(h, Nil) => Nil
-      case Cons(h, rest) => Cons(h, init(rest))
-    }
-  }
-
-  def foldRight[A, B](l: List[A], z: B)(f: (A, B) => B): B =
+  def foldRight[A,B](l: List[A], z: B)(f: (A, B) => B): B =
     l match {
       case Nil => z
       case Cons(x, xs) => f(x, foldRight(xs, z)(f))
     }
 
-  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
-    l match {
-      case Nil => z
-      case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
-    }
-  }
-
-  def foldLeft2[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
-    val reverse1: List[A] = List.reverse(l)
-    foldRight(reverse1, z)((a: A, b: B) => f(b, a))
-  }
-
   def sum2(l: List[Int]) =
     foldRight(l, 0.0)(_ + _)
-
-  def sumLeft(l: List[Int]) =
-    foldLeft(l, 0.0)(_ + _)
 
   def product2(l: List[Double]) =
     foldRight(l, 1.0)(_ * _)
 
-  def productRight(l: List[Int]) =
-    foldLeft(l, 1.0)(_ * _)
+  def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = l match {
+    case Nil => Nil
+    case Cons(h, t) if f(h) => dropWhile(t)(f)
+    case _ => l
+  }
 
+  def setHead[A](l: List[A], newHead: A): List[A] = l match {
+    case Nil => Nil
+    case Cons(_, t) => Cons(newHead, t)
+  }
 
-  // ex-9
+  // ex6
+
+  def init[A](l: List[A]): List[A] = {
+    def loop(acc: List[A], rest: List[A]): List[A] = {
+      rest match {
+        case Nil => acc
+        case Cons(_, Nil) => acc
+        case Cons(a, t) => loop(Cons(a, acc), t)
+      }
+    }
+    loop(Nil, l)
+  }
+
+  // ex 9
   def length[A](l: List[A]): Int = {
-    foldRight(l, 0)((a, b) => b + 1)
+    foldRight(l, 0)((_, acc) => acc + 1)
   }
 
-  //ex-12
+  // ex 10
+  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+    l match {
+      case Nil => z
+      case Cons(x, t) =>
+        foldLeft(t, f(z, x))(f)
+    }
+  }
+
+  def length2[A](l: List[A]): Int = {
+   foldLeft(l, 0)((acc, _) => acc + 1)
+  }
+
+  def sumLeft[A](l: List[A]): Int = {
+    //foldLeft(l, 0)((acc, c) => c + acc)
+    ???
+  }
+
+  // ex-12
   def reverse[A](l: List[A]): List[A] = {
-    foldLeft(l, Nil: List[A])((acc, newValue) => Cons(newValue, acc))
+    foldLeft(l, Nil: List[A])((acc, a) => Cons(a, acc))
   }
 
-  //ex-14
-  def append[A](l: List[A], value: A): List[A] = {
-    foldRight(l, Cons(value, Nil))(Cons(_, _))
+  // ex-13
+  def foldLeft2[A, B](l: List[A], z: B)(f: (B, A) => B): List[B] = {
+    
+    ???
   }
 
-  //ex-15
-  def concat[A](l: List[List[A]]): List[A] = {
-    foldRight(l, Nil: List[A])((newList, accList) =>
-      foldRight(newList, accList)(Cons(_, _))
-    )
+  // ex-14
+  def append[A](l: List[A], item: A): List[A] = {
+    foldRight(l, Cons(item, Nil))((a, acc) => Cons(a, acc))
   }
 
-  //ex-16
-  def addOne(l: List[Int]): List[Int] = {
-    foldRight(l, Nil: List[Int])((value, acc) => Cons(value + 1, acc))
+  // ex-15
+  def concat[A](l1: List[A], l2: List[A]): List[A] = {
+    foldRight(l1, l2)((a, acc) => Cons(a, acc))
   }
 
-  //ex-17
-  def doubleToString(l: List[Double]): List[String] = {
-    foldRight(l, Nil: List[String])((value, acc) => Cons(value.toString, acc))
+  // ex-15a
+  def concatProper[A](l: List[List[A]]): List[A] = {
+    foldRight(l, Nil: List[A])((a, acc) => concat(a, acc))
   }
 
-  //ex-18
-  def map[A, B](l: List[A])(f: A => B): List[B] = {
-    foldRight(l, Nil: List[B])((value, acc) => Cons(f(value), acc))
+  // ex-16
+  def mapOne(l: List[Int]): List[Int] = {
+    l match {
+      case Nil => Nil
+      case Cons(x, t) => Cons(x + 1, mapOne(t))
+    }
   }
 
-  //ex-19 / 21
+  // ex-17
+  def mapString(l: List[Double]): List[String] = {
+    l match {
+      case Nil => Nil
+      case Cons(x, t) => Cons(x.toString, mapString(t))
+    }
+  }
+
+  def map[A,B](l: List[A])(f: A => B): List[B] = {
+    l match {
+      case Nil => Nil
+      case Cons(x, t) => Cons(f(x), map(t)(f))
+    }
+  }
+
+  def flatMap[A,B](l: List[A])(f: A => List[B]): List[B] = {
+    l match {
+      case Nil => Nil
+      case Cons(x, t) => concat(f(x), flatMap(t)(f))
+    }     
+  }
+
+  // ex-21
   def filter[A](l: List[A])(f: A => Boolean): List[A] = {
-    flatMap(l)(value => if (f(value)) List(value) else Nil)
+    flatMap(l) { a => if (f(a)) List(a) else Nil }
   }
 
-  //ex-20
-  def flatMap[A, B](l: List[A])(f: A => List[B]): List[B] = {
-    foldRight(l, Nil: List[B])((value, acc) => concat(List(f(value), acc)))
+  // ex-22
+  def addList(l1: List[Int], l2: List[Int]): List[Int] = {
+
+    ???
   }
 
-//  //ex 22 - todo
-//  def add[Int](l1: List[Int], l2: List[Int]): List[Int] = {
-//    foldRight(l1, Nil: List[Int]) { (value: Int, acc) => {
-//        val last = foldLeft(l2, 0)((b,a) => b)
-////        val init = init(l2)
-//        Cons(value. + last, acc)
-//        ???
-//      }
-//    }
-//    ???
-//  }
-//
-//  //ex 24 - todo
-//  def hasSubsequence[Int](list: List[Int], sub: List[Int]): Boolean = {
-//    ???
-//  }
-
+    
+  def apply[A](as: A*): List[A] =
+    if (as.isEmpty) Nil
+    else Cons(as.head, apply(as.tail: _*))
 }
 
-object Main extends App {
-  val list: List[Int] = List(1, 2, 3, 4)
-  val list2: List[Int] = List(5, 6, 7, 8)
-  println("Original: " + list)
+object Example extends App {
 
-  println(List.tail(list))
+  import List._
 
-  println(List.drop(list, 2))
+  val example = Cons(1, Cons(2, Cons(3, Nil)))
+  val example2 = List(1, 2, 3, 4)
+  val example3 = List(1.0, 3.0, 0.0, 100.0)
+  val total = sum(example)
+  val lists2 = List(example, example2)
 
-  println(List.dropWhile(list)(_ != 4))
-
-  println(List.setHead(list, 500))
-
-  println("Init: " + List.init(list))
-
-  println(List.foldRight(list, Nil: List[Int])(Cons.apply))
-
-  println("Length: " + List.length(list))
-  println("Sum: " + List.sumLeft(list))
-  println("Product: " + List.productRight(list))
-  println("Reverse: " + List.reverse(list))
-  println("Append: " + List.append(list, 5))
-  println("Concat: " + List.concat(List(list, list2)))
-  println("Add One: " + List.addOne(list))
-  private val string: List[String] = List.doubleToString(List(1.0, 2.0))
-  println("ToString: " + string)
-  println("Map Add One: " + List.map(list)(_ + 1))
-  println("Filter odd" + List.filter(list)(_ % 2 == 0))
-  println("Flat map: duplicate: " + List.flatMap(list)(value => List(value, value + 1)))
-  val last: Int = List.foldLeft(list, 0)((acc: Int, next: Int) => next)
-  println("Last: " + last)
+  println(total)
+  println(tail(example))
+  println(drop(2, example))
+  println(dropWhile(example)(_ < 3))
+  println(dropWhile(example)(_ < 10))
+  println(setHead(example, 10))
+  println(init(example))
+  println(product2(example3))
+  println("Fold right with Nil " + foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_)))
+  println(length(example2))
+  println(length2(example2))
+  println(reverse(example2))
+  println(append(example2, 10))
+  println(concat(example, example2))
+  println(concatProper(lists2))
+  println(mapOne(example2))
+  println(mapString(example3))
+  println(flatMap(List(1,2,3))(i => List(i,i)))
+  println(filter(List(1,2,3))(i => (i % 2) == 0))
 }
