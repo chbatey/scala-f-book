@@ -1,0 +1,59 @@
+package chap7
+
+import java.util.concurrent._
+
+object Par {
+
+  val es = Executors.newFixedThreadPool(1)
+
+  type Par[A] = ExecutorService => Future[A]
+
+  def unit[T](c: T): Par[T] =  es => {
+    es.submit(new Callable[T] {
+      def call(): T = c
+    })
+  }
+
+  def async[A](a: => A): Par[A] = fork(unit(a))
+  def asyncF[A,B](f: A => B): A => Par[B] = a => { async(f(a)) }
+
+  def map2[A, B, T](a: Par[A], b: Par[B])(f: (A, B) => T): Par[T] = {
+    map(product(a, b))( (pair) => f(pair._1,pair._2))
+  }
+
+  def fork[T](work: => Par[T]): Par[T] = es => {
+    work(es)
+  }
+
+  def product[A,B](fa: Par[A], fb: Par[B]): Par[(A,B)] = {
+    Par.unit((Par.run(es)(fa), Par.run(es)(fb)))
+  }
+
+  def map[A,B](fa: Par[A])(f: A => B): Par[B] = Par.unit(f(Par.run(es)(fa)))
+
+  def parMap[A,B](l: List[A])(f: A => B): Par[List[B]] = {
+    val fbs: List[Par[B]] = l.map(asyncF(f))
+ 
+  }
+
+  def run[A](s: ExecutorService)(a: Par[A]): A = a(s).get()
+}
+
+object Pars extends App {
+  import Par._
+
+  println("Pars")
+
+  val one = unit({ println("one"); "one" })
+  val two = unit({ println("two"); "two" })
+  val combine = map2(one, two)((s1, s2) => s1 + s2)
+
+  println(combine)
+  println(run(es)(combine))
+
+  println(run(es)(map(one)(_.toUpperCase())))
+
+  es.shutdownNow()
+}
+
+  
